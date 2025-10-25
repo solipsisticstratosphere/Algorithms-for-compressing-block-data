@@ -1,4 +1,3 @@
-// Huffman Coding Implementation
 export class HuffmanNode {
   constructor(char, freq, left = null, right = null) {
     this.char = char;

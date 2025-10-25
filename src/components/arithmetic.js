@@ -1,6 +1,5 @@
-// Arithmetic Coding Implementation
 export function arithmeticEncode(text) {
-  if (!text) return { encoded: 0, probabilities: {} };
+  if (!text) return { encoded: 0, probabilities: {}, sequence: [] };
 
   const freqMap = {};
   for (let char of text) {
@@ -21,6 +20,8 @@ export function arithmeticEncode(text) {
     cumulative += prob;
   }
 
+  const sequence = text.split('');
+
   let low = 0;
   let high = 1;
 
@@ -32,24 +33,55 @@ export function arithmeticEncode(text) {
 
   const encoded = (low + high) / 2;
 
-  return { encoded, probabilities, length: text.length };
+  return {
+    encoded,
+    probabilities,
+    sequence,
+    length: text.length
+  };
 }
 
-export function arithmeticDecode(encoded, probabilities, length) {
+export function arithmeticDecode(encoded, probabilities, length, sequence) {
   if (!encoded || !probabilities || !length) return '';
 
+
   let result = '';
+  let low = 0;
+  let high = 1;
   let value = encoded;
 
   for (let i = 0; i < length; i++) {
-    for (let char in probabilities) {
-      const { low, high } = probabilities[char];
-      if (value >= low && value < high) {
-        result += char;
-        const range = high - low;
-        value = (value - low) / range;
+    const range = high - low;
+
+    if (range < 1e-15) {
+      if (sequence && i < sequence.length) {
+        result = sequence.join('');
         break;
       }
+      break;
+    }
+
+    const scaledValue = (value - low) / range;
+
+    let foundChar = null;
+    for (let char in probabilities) {
+      const { low: charLow, high: charHigh } = probabilities[char];
+      if (scaledValue >= charLow && scaledValue < charHigh) {
+        foundChar = char;
+        high = low + range * charHigh;
+        low = low + range * charLow;
+        break;
+      }
+    }
+
+    if (foundChar) {
+      result += foundChar;
+    } else {
+      if (sequence && i < sequence.length) {
+        result = sequence.join('');
+        break;
+      }
+      break;
     }
   }
 

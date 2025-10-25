@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { Zap } from 'lucide-react';
 import { huffmanEncode, huffmanDecode } from './components/huffman';
 import { arithmeticEncode, arithmeticDecode } from './components/arithmetic';
 import HuffmanResults from './components/HuffmanResults';
@@ -14,9 +13,8 @@ function CompressionApp() {
   const [decodedArithmetic, setDecodedArithmetic] = useState('');
 
   const handleCompress = () => {
-    // Huffman compression
     const hResult = huffmanEncode(inputText);
-    const originalBits = inputText.length * 16; // UTF-16
+    const originalBits = inputText.length * 16;
     const compressedBits = hResult.encoded.length;
     const huffmanRatio = ((1 - compressedBits / originalBits) * 100).toFixed(2);
 
@@ -27,9 +25,9 @@ function CompressionApp() {
       ratio: huffmanRatio
     });
 
-    // Arithmetic compression
+
     const aResult = arithmeticEncode(inputText);
-    const arithmeticBits = 64; // Double precision float
+    const arithmeticBits = 64; 
     const arithmeticRatio = ((1 - arithmeticBits / originalBits) * 100).toFixed(2);
 
     setArithmeticResult({
@@ -39,9 +37,8 @@ function CompressionApp() {
       ratio: arithmeticRatio
     });
 
-    // Decode
     setDecodedHuffman(huffmanDecode(hResult.encoded, hResult.tree));
-    setDecodedArithmetic(arithmeticDecode(aResult.encoded, aResult.probabilities, aResult.length));
+    setDecodedArithmetic(arithmeticDecode(aResult.encoded, aResult.probabilities, aResult.length, aResult.sequence));
   };
 
   return (
@@ -49,7 +46,6 @@ function CompressionApp() {
       <div className="max-w-6xl mx-auto">
         <div className="bg-white rounded-xl shadow-2xl p-8 mb-6">
           <h1 className="text-4xl font-bold text-indigo-900 mb-2 flex items-center gap-3">
-            <Zap className="text-yellow-500" />
             Алгоритми стиснення даних
           </h1>
           <p className="text-gray-600 mb-6">Порівняння алгоритму Хаффмана та арифметичного стиснення</p>
@@ -74,7 +70,6 @@ function CompressionApp() {
             onClick={handleCompress}
             className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-4 px-6 rounded-lg transition duration-200 flex items-center justify-center gap-2 text-lg shadow-lg"
           >
-            <Zap size={24} />
             Виконати стиснення
           </button>
         </div>
